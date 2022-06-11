@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no;user-scalable=0;"/>
+        <style>
+            body {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 1rem;
+                background-color: rgb(63, 84, 151);
+            }
+            .touchpad {
+                width: 100%;
+                background-color: rgb(57, 57, 110);
+                border-radius: 15px;
+                box-sizing: border-box;
+                height: calc(60vh - 2.5rem);
+                position: relative;
+                overflow: hidden;
+            }
+            .touch {
+                height: calc(60vh - 2.5rem);
+            }
+            .leftmouse {
+                height: calc(10vh);
+                background-color: rgb(32, 57, 141);
+                width: 50%;
+                float: left;
+                left: 0;
+                bottom: 0;
+                position: absolute;
+            }
+            .rightmouse {
+                height: calc(10vh);
+                background-color: rgb(96, 28, 160);
+                width: 50%;
+                right: 0;
+                bottom: 0;
+                position: absolute;
+            }
+            .keyboard {
+                margin-top: 2rem;
+                border-radius: 15px;
+                width: 100%;
+                color: white;
+                background-color: rgb(32, 57, 141);
+                border: none;
+                padding: 0.5rem;
+                box-sizing: border-box;
+                height: 5rem;
+                width: calc(100% - 18vw);
+                vertical-align: middle;
+                outline: none;
+                font-size: 2rem;
+            }
+            .send {
+                position: absolute;
+                right: 1rem;
+            }
+            .send, .enter, .backspace, .copy, .paste, .toggle-drag {
+                width: calc(16vw);
+                vertical-align: middle;
+                height: 5rem;
+                margin-top: 2rem;
+                background-color: rgb(96, 28, 160);
+                color: white;
+                border: none;
+                border-radius: 15px;
+            }
+            .leftmouse:active { 
+                background-color: rgb(20, 38, 97);
+            }
+            .rightmouse:active, .send:active, .enter:active, .backspace:active, .copy:active, .paste:active, .toggle-drag[data-active="true"] {
+                background-color: rgb(54, 14, 92);
+            }
+            body, html { 
+                overflow-x: hidden; 
+                overflow-y: auto;
+            }
+        </style>
+    </head>    
+    <body>
+        <div class="touchpad">
+            <div class="touch"></div>
+            <div class="leftmouse"></div>
+            <div class="rightmouse"></div>
+        </div>
+        <textarea class="keyboard"></textarea>
+        <button class="send">Typewrite</button>
+        <br/>
+        <button class="enter">Enter</button>
+        <button class="backspace">Backspace</button>
+        <button class="copy">Copy</button>
+        <button class="paste">Paste</button>
+        <button class="toggle-drag">Toggle Drag</button>
+        <script>
+            (async function () {
+                var mapButtonEventToRoute = function (button, event, route) {
+                    button.addEventListener(event, function () {
+                        if (typeof route === 'string') {
+                            fetch(route);
+                        }
+                        if (typeof route === 'function') {
+                            fetch(route());
+                        }
+                    })
+                }
+
+                // #region keyboard controls
+                var keyboard = document.querySelector('.keyboard');
+                var typewriteSend = document.querySelector('.send');
+                mapButtonEventToRoute(typewriteSend, 'click', function () {
+                    var key = keyboard.value;
+                    keyboard.value = "";
+                    return "/typewrite?query=" + encodeURI(key);
+                });
+
+                var enter = document.querySelector(".enter");
+                mapButtonEventToRoute(enter, 'click', '/send/enter');
+
+                var backspace = document.querySelector(".backspace");
+                mapButtonEventToRoute(backspace, 'click', '/send/backspace');
+
+                var copy = document.querySelector(".copy");
+                mapButtonEventToRoute(copy, 'click', '/send-hotkey/ctrl,c');
+                
+                var paste = document.querySelector(".paste");
+                mapButtonEventToRoute(paste, 'click', '/send-hotkey/ctrl,v');
+
+                window.isClicking = false;
+                var toggleDrag = document.querySelector('.toggle-drag');
+                mapButtonEventToRoute(toggleDrag, 'click', function () {
+                    window.isClicking = !window.isClicking;
+                    toggleDrag.setAttribute("data-active", window.isClicking);
+                    return "/disabledrag";
+                });
+                // #endregion
+
+                // #region mouse controls
+                var leftmouse = document.querySelector('.leftmouse');
+                mapButtonEventToRoute(leftmouse, 'click', '/sendleftclick');
+
+                var rightmouse = document.querySelector('.rightmouse');
+                mapButtonEventToRoute(rightmouse, 'click', '/sendrightclick');
+                // The current dx and dy
+                var d = {x: 0, y: 0};
+                var isTouching = false;
+                var touchpad = document.querySelector('.touch');
+                window.lastTimeSent = 0;
+                touchpad.addEventListener('touchstart', function (e) {
+                    isTouching = true;
+                    d.x = event.touches[0].clientX;
+                    d.y = event.touches[0].clientY;
+                });
+                touchpad.addEventListener('touchmove', function (e) {
+                    // if the last time trackpad data was send is greater than 150ms ago,
+                    if (window.lastTimeSent < new Date().getTime() - 150) {
+                        
+                        if (isTouching) {
+                            var distx = d.x - event.touches[0].clientX;
+                            var disty = d.y - event.touches[0].clientY;
+                            d.x = event.touches[0].clientX;
+                            d.y = event.touches[0].clientY;
+                            if (!isClicking) {
+                                fetch("/mousemove/" + (- distx * 2) + "/" +  (- disty * 2))
+                            } else {
+                                fetch("/mousedrag/" + (- distx * 2) + "/" +  (- disty * 2))
+                            }
+                            window.lastTimeSent = new Date().getTime();
+                        }
+                    }
+                });
+                touchpad.addEventListener('touchend', function (e) {
+                    isTouching = false;
+                    d.x = 0;
+                    d.y = 0;
+                });
+                // #endregion
+            }());
+        </script>
+    </body>
+</html>
