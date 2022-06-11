@@ -142,7 +142,7 @@
 
                 var rightmouse = document.querySelector('.rightmouse');
                 mapButtonEventToRoute(rightmouse, 'click', '/sendrightclick');
-                // The current dx and dy
+                // The current position object
                 var d = {x: 0, y: 0};
                 var isTouching = false;
                 var touchpad = document.querySelector('.touch');
@@ -153,17 +153,20 @@
                     d.y = event.touches[0].clientY;
                 });
                 touchpad.addEventListener('touchmove', function (e) {
-                    // if the last time trackpad data was send is greater than 150ms ago,
+                    // if the last time trackpad data was sent is greater than 150ms ago,
                     if (window.lastTimeSent < new Date().getTime() - 150) {
-                        
+                        // and if the user is current touching the screen
                         if (isTouching) {
+                            // calculate the distance moved since last fetch to server
                             var distx = d.x - event.touches[0].clientX;
                             var disty = d.y - event.touches[0].clientY;
+                            // set the d object to the current client x and y values
                             d.x = event.touches[0].clientX;
                             d.y = event.touches[0].clientY;
-                            if (!isClicking) {
+                            
+                            if (!isClicking) {// if the drag toggle is disabled
                                 fetch("/mousemove/" + (- distx * 2) + "/" +  (- disty * 2))
-                            } else {
+                            } else {// if the drag toggle is enabled
                                 fetch("/mousedrag/" + (- distx * 2) + "/" +  (- disty * 2))
                             }
                             window.lastTimeSent = new Date().getTime();
@@ -171,6 +174,7 @@
                     }
                 });
                 touchpad.addEventListener('touchend', function (e) {
+                    // clear out the position  object and the isTouching variable
                     isTouching = false;
                     d.x = 0;
                     d.y = 0;
