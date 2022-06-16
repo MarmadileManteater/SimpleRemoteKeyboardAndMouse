@@ -17,6 +17,14 @@ IP_addres = socket.gethostbyname(hostname)
 if len(sys.argv) > 1:
     IP_addres = sys.argv[1]
 
+@route('/script.js')
+def styles():
+    return static_file("script.js", root='./')
+
+@route('/styles.css')
+def styles():
+    return static_file("styles.css", root='./')
+
 # at the route, serve up the controls page
 @route('/')
 def index():
