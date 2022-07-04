@@ -60,12 +60,14 @@ def sendrightclick():
 @route('/mousemove/<x>/<y>')
 def mousemove(x, y):
     currentX, currentY = pyautogui.position()
-    pyautogui.moveTo(currentX + int(x), currentY + int(y))
+    pyautogui.moveTo(currentX + float(x), currentY + float(y))
 
 @route('/mousescroll/<x>/<y>')
 def mousescroll(x, y):
-    pyautogui.hscroll(int(x) // 16)
-    pyautogui.vscroll(int(y) // 16)
+    h = int(float(x)) * 4
+    v = int(float(y)) * 4
+    pyautogui.hscroll(h)
+    pyautogui.vscroll(v)
 
 @route('/disabledrag')
 def disabledrag():
