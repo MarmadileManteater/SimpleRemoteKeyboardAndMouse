@@ -72,6 +72,9 @@ body {
 .backspace, .send {
     font-size: 0.75rem;
 }
+.send {
+    margin-top: 2rem;
+}
 .leftmouse:active { 
     background-color: rgb(71, 104, 212);
 }
