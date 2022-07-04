@@ -64,7 +64,8 @@ def mousemove(x, y):
 
 @route('/mousescroll/<x>/<y>')
 def mousescroll(x, y):
-    pyautogui.scroll(int(y) * 16, int(x) * 16, 1)
+    pyautogui.hscroll(int(x) // 16)
+    pyautogui.vscroll(int(y) // 16)
 
 @route('/disabledrag')
 def disabledrag():
