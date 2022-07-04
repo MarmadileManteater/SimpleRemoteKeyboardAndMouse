@@ -6,11 +6,11 @@ body {
     box-sizing: border-box;
     margin: 0;
     padding: 1rem;
-    background-color: rgb(63, 84, 151);
+    background-color: #c3c3fd;
 }
 .touchpad {
     width: 100%;
-    background-color: rgb(57, 57, 110);
+    background-color: rgb(163, 163, 255);
     border-radius: 15px;
     box-sizing: border-box;
     height: calc(60vh - 2.5rem);
@@ -22,7 +22,7 @@ body {
 }
 .leftmouse {
     height: calc(10vh);
-    background-color: rgb(32, 57, 141);
+    background-color: rgb(105, 139, 255);
     width: 50%;
     float: left;
     left: 0;
@@ -31,7 +31,7 @@ body {
 }
 .rightmouse {
     height: calc(10vh);
-    background-color: rgb(96, 28, 160);
+    background-color: rgb(184, 108, 255);
     width: 50%;
     right: 0;
     bottom: 0;
@@ -41,8 +41,8 @@ body {
     margin-top: 2rem;
     border-radius: 15px;
     width: 100%;
-    color: white;
-    background-color: rgb(32, 57, 141);
+    color: black;
+    background-color: rgb(163, 163, 255);
     border: none;
     padding: 0.5rem;
     box-sizing: border-box;
@@ -56,19 +56,69 @@ body {
     position: absolute;
     right: 1rem;
 }
-.send, .enter, .backspace, .copy, .paste, .toggle-drag {
+.send, .enter, .backspace, .copy, .paste, .toggle-drag,
+.left, .up, .right, .down {
     width: calc(16vw);
     vertical-align: middle;
     height: 5rem;
-    margin-top: 2rem;
-    background-color: rgb(96, 28, 160);
+    margin-top: 1.5rem;
+    background-color: rgb(187, 113, 255);
     color: white;
     border: none;
     border-radius: 15px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+.backspace, .send {
+    font-size: 0.75rem;
 }
 .leftmouse:active { 
-    background-color: rgb(20, 38, 97);
+    background-color: rgb(71, 104, 212);
 }
-.rightmouse:active, .send:active, .enter:active, .backspace:active, .copy:active, .paste:active, .toggle-drag[data-active="true"] {
-    background-color: rgb(54, 14, 92);
+.rightmouse:active, .send:active, .enter:active, .backspace:active, .copy:active, .paste:active, .toggle-drag[data-active="true"],
+.left:active, .up:active, .right:active, .down:active {
+    background-color: rgb(127, 47, 201);
+}
+.up-down {
+    display: inline-block;
+    vertical-align: bottom;
+}
+.up-down .inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.up-down .inner .down {
+    margin-top: 0.5rem;
+}
+/*
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: rgb(63, 84, 151);
+    }
+    .touchpad {
+        background-color: rgb(57, 57, 110);
+    }
+    .leftmouse {
+        background-color: rgb(32, 57, 141);
+    }
+    .rightmouse {
+        background-color: rgb(96, 28, 160);
+    }
+    .keyboard {
+        color: white;
+        background-color: rgb(32, 57, 141);
+    }
+    .send, .enter, .backspace, .copy, .paste, .toggle-drag,
+    .left, .up, .right, .down {
+        color: white;
+        background-color: rgb(96, 28, 160);
+    }
+    .leftmouse:active { 
+        background-color: rgb(20, 38, 97);
+    }
+    .rightmouse:active, .send:active, .enter:active, .backspace:active, .copy:active, .paste:active, .toggle-drag[data-active="true"],
+    .left:active, .up:active, .right:active, .down:active {
+        background-color: rgb(54, 14, 92);
+    }
 }

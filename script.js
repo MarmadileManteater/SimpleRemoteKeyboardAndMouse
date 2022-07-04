@@ -44,6 +44,19 @@
     var paste = document.querySelector(".paste");
     mapButtonEventToRoute(paste, 'click', '/send-hotkey/ctrl,v');
 
+    var left = document.querySelector(".left");
+    mapButtonEventToRoute(left, 'click', '/send/left');
+
+    var up = document.querySelector(".up");
+    mapButtonEventToRoute(up, 'click', '/send/up');
+
+    var down = document.querySelector(".down");
+    mapButtonEventToRoute(down, 'click', '/send/down');
+    
+    var right = document.querySelector(".right");
+    mapButtonEventToRoute(right, 'click', '/send/right');
+
+
     window.isClicking = false;
     var toggleDrag = document.querySelector('.toggle-drag');
     mapButtonEventToRoute(toggleDrag, 'click', function () {
