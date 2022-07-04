@@ -13,12 +13,12 @@ body {
     background-color: rgb(163, 163, 255);
     border-radius: 15px;
     box-sizing: border-box;
-    height: calc(60vh - 2.5rem);
+    height: calc(50vh - 2.5rem);
     position: relative;
     overflow: hidden;
 }
 .touch {
-    height: calc(60vh - 2.5rem);
+    height: calc(50vh - 2.5rem);
 }
 .leftmouse {
     height: calc(10vh);
@@ -143,7 +143,7 @@ body.lunar {
     border-radius: 0;
     background-color: white;
     margin-bottom: 10px;
-    height: calc(60vh - 8.25rem);
+    height: calc(50vh - 8.25rem);
 }
 
 .lunar .leftmouse {
@@ -211,6 +211,10 @@ body.foundation {
     background: white;
     border-top: 2px solid #e6e6e6;
     border-left: 1px solid #e6e6e6;
+}
+
+.foundation .backspace {
+    font-size: 0.6rem;
 }
 
 .foundation .send, .foundation .enter, .foundation .backspace, .foundation .copy, .foundation .paste, .foundation .toggle-drag,
