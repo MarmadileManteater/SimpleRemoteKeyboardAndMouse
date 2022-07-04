@@ -28,6 +28,7 @@ body {
     left: 0;
     bottom: 0;
     position: absolute;
+    box-sizing: border-box;
 }
 .rightmouse {
     height: calc(10vh);
@@ -36,6 +37,7 @@ body {
     right: 0;
     bottom: 0;
     position: absolute;
+    box-sizing: border-box;
 }
 .keyboard {
     margin-top: 2rem;
@@ -124,4 +126,61 @@ body {
     .left:active, .up:active, .right:active, .down:active {
         background-color: rgb(54, 14, 92);
     }
+}
+
+body.lunar {
+    background-color: #ebe9da;
+    font-family: Tahoma;
+}
+
+.lunar .touchpad {
+    background: transparent;
+    border-radius: 0;
+}
+
+.lunar .touch {
+    border: 1px solid #c4cbd1;
+    border-radius: 0;
+    background-color: white;
+    margin-bottom: 10px;
+    height: calc(60vh - 8.25rem);
+}
+
+.lunar .leftmouse {
+    background: linear-gradient(#fdfdfd, #f0f0ea);
+    border: 1px solid;
+    border-radius:5px;
+    font-weight: normal;
+}
+
+.lunar .rightmouse {
+    background: linear-gradient(#fdfdfd, #f0f0ea);
+    border: 1px solid;
+    border-radius:5px;
+    font-weight: normal;
+}
+
+.lunar .send, .lunar .enter, .lunar .backspace, .lunar .copy, .lunar .paste, .lunar .toggle-drag,
+.lunar .left, .lunar .up, .lunar .right, .lunar .down {
+    color: black;
+    background: linear-gradient(#fdfdfd, #f0f0ea);
+    border: 1px solid;
+    border-radius:5px;
+    font-weight: normal;
+}
+.lunar .leftmouse:active { 
+    background: linear-gradient(#fdfdfd, #f0f0ea);
+    box-shadow: inset 0em 0em 1rem #eebe68;
+}
+.lunar .rightmouse:active, .lunar .send:active, .lunar .enter:active, .lunar .backspace:active, .lunar .copy:active, .lunar .paste:active, .lunar .toggle-drag[data-active="true"],
+.lunar .left:active, .lunar .up:active, .lunar .right:active, .lunar .down:active {
+    background: linear-gradient(#fdfdfd, #f0f0ea);
+    box-shadow: inset 0em 0em 1rem #eebe68;
+}
+
+.lunar .keyboard {
+    border: 1px solid #c4cbd1;
+    border-radius: 0;
+    background-color: white;
+    color: black;
 }

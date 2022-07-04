@@ -1,5 +1,7 @@
 (async function () {
-
+    if (window.location.search.split("?")[1] === 'theme=lunar') {
+        document.body.setAttribute('class', 'lunar')
+    }
     /**
      * @param {array} coordA an array that contains the coordinate pair [ x1, y1 ]
      * @param {array} coordB an array that contains the coordinate pair [ x2, y2 ]
