@@ -1,7 +1,33 @@
 (async function () {
-    if (window.location.search.split("?")[1] === 'theme=lunar') {
-        document.body.setAttribute('class', 'lunar')
+
+    var getQuery = function () {
+        var queryObject = {};
+        if (window.location.search) {
+            var queryArray;
+            var queryParts = window.location.search.split("?")[1];
+            if (queryParts.indexOf("&") !== -1) {
+                queryArray = queryParts.split("&")
+            } else {
+                queryArray = [queryParts]
+            }
+            for (var i = 0; i < queryArray.length; i++) {
+                var queryEntry = queryArray[i];
+                if (queryEntry.indexOf('=') !== -1) {
+                    var keyValuePair = queryEntry.split("=");
+                    if (keyValuePair.length === 2) {// only honor valid key value pairs
+                        queryObject[keyValuePair[0]] = keyValuePair[1]
+                    }
+                }
+            }
+        }
+        return queryObject;
     }
+
+    var pageQuery = getQuery();
+    if (Object.keys(pageQuery).indexOf('theme') !== -1) {
+        document.body.setAttribute('class', pageQuery['theme']);
+    }
+    
     /**
      * @param {array} coordA an array that contains the coordinate pair [ x1, y1 ]
      * @param {array} coordB an array that contains the coordinate pair [ x2, y2 ]

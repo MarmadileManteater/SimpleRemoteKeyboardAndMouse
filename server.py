@@ -30,6 +30,9 @@ def styles():
 def index():
     return static_file("controls.html", root='./')
 
+@route('/fonts/Rubik-VariableFont_wght.ttf')
+def foundationFont():
+    return static_file("fonts/Rubik-VariableFont_wght.ttf", root="./", mimetype="application/x-font-ttf")
 #region keyboard controls
 
 # type whatever is sent through the pyautogui typewrite method

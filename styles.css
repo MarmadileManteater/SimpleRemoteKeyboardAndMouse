@@ -151,6 +151,7 @@ body.lunar {
     border: 1px solid;
     border-radius:5px;
     font-weight: normal;
+    width: 49%;
 }
 
 .lunar .rightmouse {
@@ -158,6 +159,7 @@ body.lunar {
     border: 1px solid;
     border-radius:5px;
     font-weight: normal;
+    width: 49%;
 }
 
 .lunar .send, .lunar .enter, .lunar .backspace, .lunar .copy, .lunar .paste, .lunar .toggle-drag,
@@ -183,4 +185,57 @@ body.lunar {
     border-radius: 0;
     background-color: white;
     color: black;
+}
+
+@font-face {
+    font-family: Rubik;
+    src: url(fonts/Rubik-VariableFont_wght.ttf);
+}
+
+body.foundation {
+    background-color: white;
+}
+
+.foundation .touchpad {
+    background: transparent;
+    box-shadow: 0 0 .3rem 0 rgba(0,0,0,.25);
+}
+
+.foundation .leftmouse {
+    background: white;
+    border-top: 2px solid #e6e6e6;
+    border-right: 1px solid #e6e6e6;
+}
+
+.foundation .rightmouse {
+    background: white;
+    border-top: 2px solid #e6e6e6;
+    border-left: 1px solid #e6e6e6;
+}
+
+.foundation .send, .foundation .enter, .foundation .backspace, .foundation .copy, .foundation .paste, .foundation .toggle-drag,
+.foundation .left, .foundation .up, .foundation .right, .foundation .down {
+    background: rgb(0, 69, 173);
+    border-radius: .5rem;
+    font-family: 'Rubik';
+}
+.foundation .leftmouse:active,
+.foundation .rightmouse:active { 
+    background: #e9e9ed;
+}
+ .foundation .send:active, .foundation .enter:active, .foundation .backspace:active, .foundation .copy:active, .foundation .paste:active, .foundation .toggle-drag[data-active="true"],
+.foundation .left:active, .foundation .up:active, .foundation .right:active, .foundation .down:active {
+    background: #0052cc;
+}
+
+.foundation .keyboard {
+    border: 3px solid #999;
+    border-radius: 0;
+    background-color: white;
+    color: black;
+    font-family: 'Rubik';
+}
+
+.foundation .keyboard:focus {
+    outline: solid 2px #0052cc;
 }
