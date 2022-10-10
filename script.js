@@ -47,51 +47,28 @@
                 })
     })
     // The current position object
-    let d = {x: 0, y: 0}
-    let isTouching = false
-    let isScrolling = false
+    let state = {x: 0, y: 0, isTouching: false, isScrolling: false, lastTimeSent: 0 }
     let touchpad = document.querySelector('.touch')
-    let lastTimeSent = 0
     touchpad.addEventListener('touchstart', (e) => {
         e.preventDefault()
-        isTouching = true
-        if (e.touches.length > 1)// This is a scroll event
-            isScrolling = true
-        d = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+        state = { x: e.touches[0].clientX, y: e.touches[0].clientY, isTouching: true, isScrolling: e.touches.length > 1, lastTimeSent: state.lastTimeSent }
     })
-    touchpad.addEventListener('touchmove', function (e) {
+    touchpad.addEventListener('touchmove', (e) => {
         // if the user is current touching the screen and the last time trackpad data was sent is greater than 150ms ago,
-        if (lastTimeSent < new Date().getTime() - 150 && isTouching) {
+        if (state.lastTimeSent < new Date().getTime() - 150 && state.isTouching) {
             // calculate the distance moved since last fetch to server
             let touches = Array.from(e.touches).map((touch) => {
                 return [touch.clientX, touch.clientY]
             })
-            let dx = d.x - touches[0][0]
-            let dy = d.y - touches[0][1]
+            let dx = parseInt(state.x - touches[0][0])
+            let dy = parseInt(state.y - touches[0][1])
             // set the d object to the current client x and y values
-            d = { x: touches[0][0], y: touches[0][1] }
-            isScrolling = false
-            if (e.touches.length == 2) {// this is a scroll event
-                let distance = calculateDistance.apply(null, touches)
-                if (distance < 100)
-                    isScrolling = true
-            }
-            if (isScrolling) {
-                fetch(`/mousescroll/${(- dx * 2)}/${(- dy * 2)}`)
-            } else {
-                if (!isDragToggled) {// if the drag toggle is disabled
-                    fetch(`/mousemove/${(- dx * 2)}/${(- dy * 2)}`)
-                } else {// if the drag toggle is enabled
-                    fetch(`/mousedrag/${(- dx * 2)}/${(- dy * 2)}`)
-                }
-            }
-            lastTimeSent = new Date().getTime()
+            state = { x: touches[0][0], y: touches[0][1], isScrolling: touches.length == 2?calculateDistance.apply(null, touches) < 100:false, isTouching: state.isTouching, lastTimeSent: new Date().getTime() }
+            fetch(`/mouse${state.isScrolling?'scroll':isDragToggled?'drag':'move'}/${(- dx * 2)}/${(- dy * 2)}`)
         }
     })
     touchpad.addEventListener('touchend', () => {
         // clear out the position  object and the isTouching variable
-        isTouching = false
-        isScrolling = false
-        d = { x: 0, y: 0 }
+        state = { x: 0, y: 0, isTouching: false, isScrolling: false, lastTimeSent: state.lastTimeSent }
     })
 }())
