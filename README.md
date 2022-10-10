@@ -1,4 +1,4 @@
-# Simple Remote Mouse and Keyboard Web app
+# Simple Remote Mouse and Keyboard web app
 
 A simple bottle web app which allows a mobile device to connect over the local network to control the mouse and keyboard.
 
