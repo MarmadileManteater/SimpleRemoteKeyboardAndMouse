@@ -2,31 +2,18 @@
     let theme
     if ((theme = new URLSearchParams(window.location.search).get('theme')) !== undefined)
         document.body.setAttribute('class', theme)
-    /**
-     * @param {array} a an array that contains the coordinate pair [ x1, y1 ]
-     * @param {array} b an array that contains the coordinate pair [ x2, y2 ]
-    **/
     let calculateDistance = (a, b) => {
         return Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2))
     }
     let mapButtonEventToRoute = (button, event, route) => {
         button.addEventListener(event, () => {
-            switch (typeof route) {
-                case 'string':
-                    fetch(route)
-                    break
-                case 'function':
-                    fetch(route())
-                    break
-                default:
-                    console.warn(`The given button route "${route}" is not a string or function.`)
-                    break
-            }
+            let routeType, fetchRoute// if the route is a function, evaluate it, and if it is a string, just send it
+            if ((fetchRoute = (routeType = typeof route) === 'function'?route():routeType === 'string'?route:'') !== '')
+                return fetch(fetchRoute)
         })
     }
     let keyboard = document.querySelector('.keyboard')
-    let typewriteSend = document.querySelector('.send')
-    mapButtonEventToRoute(typewriteSend, 'click', () => {
+    mapButtonEventToRoute(document.querySelector('.send'), 'click', () => {
         let key = keyboard.value
         keyboard.value = ''
         return `/typewrite?query=${encodeURI(key)}`
@@ -54,12 +41,12 @@
         state = { x: e.touches[0].clientX, y: e.touches[0].clientY, isTouching: true, isScrolling: e.touches.length > 1, lastTimeSent: state.lastTimeSent }
     })
     touchpad.addEventListener('touchmove', (e) => {
-        // if the user is current touching the screen and the last time trackpad data was sent is greater than 150ms ago,
+        // if the user is currently touching the screen and the last time trackpad data was sent is greater than 150ms ago,
         if (state.lastTimeSent < new Date().getTime() - 150 && state.isTouching) {
-            // calculate the distance moved since last fetch to server
             let touches = Array.from(e.touches).map((touch) => {
                 return [touch.clientX, touch.clientY]
             })
+            // calculate the distance moved since last fetch to server
             let dx = parseInt(state.x - touches[0][0])
             let dy = parseInt(state.y - touches[0][1])
             // set the d object to the current client x and y values
