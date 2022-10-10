@@ -42,7 +42,12 @@ def sendkeystroke():
 
 @route('/send/<key>')
 def sendkey(key):
-    pyautogui.press(key)
+    if key == 'leftclick':
+        pyautogui.click()
+    elif key == 'rightclick':
+        pyautogui.rightClick()
+    else:
+        pyautogui.press(key)
 
 @route('/send-hotkey/<keys>')
 def sendHotkey(keys):
@@ -52,14 +57,6 @@ def sendHotkey(keys):
 #endregion
 
 #region mouse controls
-@route('/sendleftclick')
-def sendleftclick():
-    pyautogui.click()
-
-@route('/sendrightclick')
-def sendrightclick():
-    pyautogui.rightClick()
-
 @route('/mousemove/<x>/<y>')
 def mousemove(x, y):
     currentX, currentY = pyautogui.position()

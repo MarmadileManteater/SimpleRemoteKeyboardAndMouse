@@ -2,31 +2,35 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no;user-scalable=0;"/>
-        <link rel="stylesheet" type="text/css" href="styles.css" />
+        <link rel="stylesheet" type="text/css" href="styles.css?t2" />
     </head>    
     <body >
         <div class="touchpad">
             <div class="touch"></div>
-            <div class="leftmouse"></div>
-            <div class="rightmouse"></div>
+            <div class="ui leftmouse" data-send="leftclick"></div>
+            <div class="ui rightmouse" data-send="rightclick"></div>
         </div>
         <textarea class="keyboard"></textarea>
-        <button class="send">Typewrite</button>
+        <button class="send keys">Typewrite</button>
         <br/>
-        <button class="enter">Enter</button>
-        <button class="backspace">Backspace</button>
-        <button class="copy">Copy</button>
-        <button class="paste">Paste</button>
-        <button class="toggle-drag">Toggle Drag</button>
+        <button class="ui keys" data-send="enter">Enter</button>
+        <button class="ui keys backspace" data-send="backspace">Backspace</button>
+        <button class="ui keys" data-hotkey="ctrl,c">Copy</button>
+        <button class="ui keys" data-hotkey="ctrl,v" >Paste</button>
+        <button class="ui keys" data-toggle="drag">Toggle Drag</button>
         <br/>
-        <button class="left">←</button>
+        <button class="ui keys" data-send="volumemute">🔇</button>
+        <button class="ui keys" data-send="volumedown">🔈</button>
+        <button class="ui keys" data-send="volumeup">🔊</button>
+        <br/>
+        <button class="ui keys" data-send="left">←</button>
         <div class="up-down">
             <div class="inner">
-                <button class="up">↑</button>
-                <button class="down">↓</button>
+                <button class="ui keys up" data-send="up">↑</button>
+                <button class="ui keys down" data-send="down">↓</button>
             </div>
         </div>
-        <button class="right">→</button>
-        <script src="script.js"></script>
+        <button class="ui keys" data-send="right">→</button>
+        <script src="script.js?t2"></script>
     </body>
 </html>
