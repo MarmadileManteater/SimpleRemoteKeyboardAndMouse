@@ -1,66 +1,39 @@
 (async function () {
-    
-    var getQuery = function () {
-        var queryObject = {};
-        if (window.location.search) {
-            var queryArray;
-            var queryParts = window.location.search.split("?")[1];
-            if (queryParts.indexOf("&") !== -1) {
-                queryArray = queryParts.split("&")
-            } else {
-                queryArray = [queryParts]
-            }
-            for (var i = 0; i < queryArray.length; i++) {
-                var queryEntry = queryArray[i];
-                if (queryEntry.indexOf('=') !== -1) {
-                    var keyValuePair = queryEntry.split("=");
-                    if (keyValuePair.length === 2) {// only honor valid key value pairs
-                        queryObject[keyValuePair[0]] = keyValuePair[1]
-                    }
-                }
-            }
-        }
-        return queryObject;
-    }
-
-    var pageQuery = getQuery();
-    if (Object.keys(pageQuery).indexOf('theme') !== -1) {
-        document.body.setAttribute('class', pageQuery['theme']);
-    }
-    
+    let theme
+    if ((theme = new URLSearchParams(window.location.search).get('theme')) !== undefined)
+        document.body.setAttribute('class', theme)
     /**
-     * @param {array} coordA an array that contains the coordinate pair [ x1, y1 ]
-     * @param {array} coordB an array that contains the coordinate pair [ x2, y2 ]
+     * @param {array} a an array that contains the coordinate pair [ x1, y1 ]
+     * @param {array} b an array that contains the coordinate pair [ x2, y2 ]
     **/
-    var calculate2DDistance = function (coordA, coordB) {
-        var x1 = parseInt(coordA[0]);
-        var x2 = parseInt(coordB[0]);
-        var y1 = parseInt(coordA[1]);
-        var y2 = parseInt(coordB[1]);
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    let calculateDistance = (a, b) => {
+        return Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2))
     }
-
-    var mapButtonEventToRoute = function (button, event, route) {
-        button.addEventListener(event, function () {
-            if (typeof route === 'string') {
-                fetch(route);
-            }
-            if (typeof route === 'function') {
-                fetch(route());
+    let mapButtonEventToRoute = (button, event, route) => {
+        button.addEventListener(event, () => {
+            switch (typeof route) {
+                case 'string':
+                    fetch(route)
+                    break
+                case 'function':
+                    fetch(route())
+                    break
+                default:
+                    console.warn(`The given button route "${route}" is not a string or function.`)
+                    break
             }
         })
     }
-
-    // #region keyboard controls
-    var keyboard = document.querySelector('.keyboard')
-    var typewriteSend = document.querySelector('.send')
+    let keyboard = document.querySelector('.keyboard')
+    let typewriteSend = document.querySelector('.send')
     mapButtonEventToRoute(typewriteSend, 'click', () => {
-        var key = keyboard.value
+        let key = keyboard.value
         keyboard.value = ''
         return `/typewrite?query=${encodeURI(key)}`
     })
-    window.isClicking = false
+    let isDragToggled = false
     document.querySelectorAll('.ui').forEach((element) => {
+        let send, hk, toggle
         if ((send = element.getAttribute('data-send')) !== null)
             mapButtonEventToRoute(element, 'click', `/send/${send}`)
         if ((hk = element.getAttribute('data-hotkey')) !== null)
@@ -68,70 +41,57 @@
         if ((toggle = element.getAttribute('data-toggle')) !== null)
             if (toggle === 'drag')
                 mapButtonEventToRoute(element, 'click', () => {
-                    window.isClicking = !window.isClicking
-                    element.setAttribute('data-active', window.isClicking)
+                    isDragToggled = !isDragToggled
+                    element.setAttribute('data-active', isDragToggled)
                     return '/disabledrag'
                 })
     })
-    // #endregion
-
-    // #region mouse controls
     // The current position object
-    var d = {x: 0, y: 0};
-    var isTouching = false;
-    var isScrolling = false;
-    var touchpad = document.querySelector('.touch');
-    window.lastTimeSent = 0;
-    touchpad.addEventListener('touchstart', function (e) {
+    let d = {x: 0, y: 0}
+    let isTouching = false
+    let isScrolling = false
+    let touchpad = document.querySelector('.touch')
+    let lastTimeSent = 0
+    touchpad.addEventListener('touchstart', (e) => {
         e.preventDefault()
-        isTouching = true;
-        if (e.touches.length > 1) {
-            // This is a scroll event
-            isScrolling = true;
-        } 
-        d.x = e.touches[0].clientX;
-        d.y = e.touches[0].clientY;
-    });
+        isTouching = true
+        if (e.touches.length > 1)// This is a scroll event
+            isScrolling = true
+        d = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    })
     touchpad.addEventListener('touchmove', function (e) {
-        // if the last time trackpad data was sent is greater than 150ms ago,
-        if (window.lastTimeSent < new Date().getTime() - 150) {
-            // and if the user is current touching the screen
-            if (isTouching) {
-                // calculate the distance moved since last fetch to server
-                var distx = d.x - e.touches[0].clientX;
-                var disty = d.y - e.touches[0].clientY;
-                // set the d object to the current client x and y values
-                d.x = e.touches[0].clientX;
-                d.y = e.touches[0].clientY;
-                isScrolling = false;
-                if (e.touches.length == 2) {
-                    // This is a scroll event
-                    var distanceBetweenTouchPoints = calculate2DDistance([e.touches[0].clientX, event.touches[0].clientY], [event.touches[1].clientX, event.touches[1].clientY ]);
-
-                    if (distanceBetweenTouchPoints < 100) {
-                        isScrolling = true;
-
-                    }
-                }
-                if (isScrolling) {
-                    fetch("/mousescroll/" + (- distx * 2) + "/" +  (- disty * 2))
-                } else {
-                    if (!isClicking) {// if the drag toggle is disabled
-                        fetch("/mousemove/" + (- distx * 2) + "/" +  (- disty * 2))
-                    } else {// if the drag toggle is enabled
-                        fetch("/mousedrag/" + (- distx * 2) + "/" +  (- disty * 2))
-                    }
-                }
-                window.lastTimeSent = new Date().getTime();
+        // if the user is current touching the screen and the last time trackpad data was sent is greater than 150ms ago,
+        if (lastTimeSent < new Date().getTime() - 150 && isTouching) {
+            // calculate the distance moved since last fetch to server
+            let touches = Array.from(e.touches).map((touch) => {
+                return [touch.clientX, touch.clientY]
+            })
+            let dx = d.x - touches[0][0]
+            let dy = d.y - touches[0][1]
+            // set the d object to the current client x and y values
+            d = { x: touches[0][0], y: touches[0][1] }
+            isScrolling = false
+            if (e.touches.length == 2) {// this is a scroll event
+                let distance = calculateDistance.apply(null, touches)
+                if (distance < 100)
+                    isScrolling = true
             }
+            if (isScrolling) {
+                fetch(`/mousescroll/${(- dx * 2)}/${(- dy * 2)}`)
+            } else {
+                if (!isDragToggled) {// if the drag toggle is disabled
+                    fetch(`/mousemove/${(- dx * 2)}/${(- dy * 2)}`)
+                } else {// if the drag toggle is enabled
+                    fetch(`/mousedrag/${(- dx * 2)}/${(- dy * 2)}`)
+                }
+            }
+            lastTimeSent = new Date().getTime()
         }
-    });
-    touchpad.addEventListener('touchend', function (e) {
+    })
+    touchpad.addEventListener('touchend', () => {
         // clear out the position  object and the isTouching variable
-        isTouching = false;
-        isScrolling = false;
-        d.x = 0;
-        d.y = 0;
-    });
-    // #endregion
-}());
+        isTouching = false
+        isScrolling = false
+        d = { x: 0, y: 0 }
+    })
+}())
