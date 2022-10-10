@@ -1,237 +1,86 @@
-body, html { 
-    overflow-x: hidden; 
-    overflow-y: auto;
+:root {
+    --primary-color: #d3a4ff;
+    --primary-color-hover: #d3a4ff;
+    --secondary-color: #698bff;
+    --secondary-color-hover: #5677e3;
+    --background-color: #c3c3fd;
+    --text-color: black;
+    --body-color: white;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #601ca0;
+        --primary-color-hover: #360e5c;
+        --secondary-color: #20398d;
+        --secondary-color-hover: #142661;
+        --background-color: #39396e;
+        --text-color: white;
+        --body-color: #3f5497;
+    }
 }
 body {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 1rem;
-    background-color: #c3c3fd;
+    background-color: var(--body-color);
+}
+.border-radius {
+    border: 0px;
+    border-radius: 12px;
+    outline: none;
 }
 .touchpad {
     width: 100%;
-    background-color: rgb(163, 163, 255);
-    border-radius: 15px;
-    box-sizing: border-box;
-    height: calc(40vh - 2.5rem);
-    position: relative;
     overflow: hidden;
+    margin-bottom: 2vh;
 }
-.touch {
-    height: calc(50vh - 2.5rem);
-}
-.leftmouse {
-    height: calc(10vh);
-    background-color: rgb(105, 139, 255);
-    width: 50%;
-    float: left;
-    left: 0;
-    bottom: 0;
-    position: absolute;
-    box-sizing: border-box;
-}
-.rightmouse {
-    height: calc(10vh);
-    background-color: rgb(184, 108, 255);
-    width: 50%;
-    right: 0;
-    bottom: 0;
-    position: absolute;
-    box-sizing: border-box;
-}
-.keyboard {
-    margin-top: 2rem;
-    border-radius: 15px;
+.touchpad .touch {
     width: 100%;
-    color: black;
-    background-color: rgb(163, 163, 255);
-    border: none;
-    padding: 0.5rem;
+    height: 30vh;
+    background-color: var(--background-color);
+}
+.touchpad .leftmouse, .touchpad .rightmouse {
+    width: 50%;
+    background-color: var(--secondary-color);
+    height: 10vh;
+}
+.flex-box {
+    display: flex;
+}
+.flex-box.wrap {
+    flex-wrap: wrap;
+}
+.flex-box.space-between {
+    margin: 1vh -1vw;
+}
+.flex-box.space-between .keys {
+    margin: auto 1vw 1vh 1vw;
+}
+.flex-box.space-between .keyboard {
+    margin: 0px 1vw 1vh 1vw;
+}
+.flex-box .keys {
+    width: 17vw;
+    height: 10vh;
+    margin-top: auto;
+    color: var(--text-color);
+}
+.flex-box .keyboard {
+    width: 80vw;
+    background-color: var(--background-color);
+    padding: 10px;
     box-sizing: border-box;
-    height: 4rem;
-    width: calc(100% - 18vw);
-    vertical-align: middle;
-    outline: none;
-    font-size: 2rem;
+    color: var(--text-color);
 }
-.send {
-    position: absolute;
-    right: 1rem;
-}
-.keys {
-    width: calc(16vw);
-    vertical-align: middle;
-    height: 4rem;
-    margin-top: 1.5rem;
-    background-color: rgb(187, 113, 255);
-    color: white;
-    border: none;
-    border-radius: 15px;
-    font-weight: bold;
-    font-size: 1rem;
-}
-.backspace, .send {
-    font-size: 0.7rem;
-}
-.send {
-    margin-top: 2rem;
-}
-.keys:active { 
-    background-color: rgb(71, 104, 212);
-}
-.keys:active, .keys[data-active="true"] {
-    background-color: rgb(127, 47, 201);
-}
-.up-down {
-    display: inline-block;
-    vertical-align: bottom;
-}
-.up-down .inner {
+.flex-box .up-down > .inner {
     display: flex;
     flex-direction: column;
 }
-
-.up-down .inner .down {
-    margin-top: 0.5rem;
+.keys, .touchpad .rightmouse {
+    background-color: var(--primary-color);
 }
-
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: rgb(63, 84, 151);
+.touchpad .rightmouse:active, .keys:active, .keys[data-active="true"] {
+    background-color: var(--primary-color-hover);
+}
+@media (max-width: 768px) {
+    .long-text {
+        font-size: 0.7em;
     }
-    .touchpad {
-        background-color: rgb(57, 57, 110);
-    }
-    .leftmouse {
-        background-color: rgb(32, 57, 141);
-    }
-    .rightmouse {
-        background-color: rgb(96, 28, 160);
-    }
-    .keyboard {
-        color: white;
-        background-color: rgb(32, 57, 141);
-    }
-    .keys {
-        color: white;
-        background-color: rgb(96, 28, 160);
-    }
-    .leftmouse:active { 
-        background-color: rgb(20, 38, 97);
-    }
-    .rightmouse:active, .keys:active, .keys[data-active="true"] {
-        background-color: rgb(54, 14, 92);
-    }
-}
-
-body.lunar {
-    background-color: #ebe9da;
-    font-family: Tahoma;
-}
-
-.lunar .touchpad {
-    background: transparent;
-    border-radius: 0;
-}
-
-.lunar .touch {
-    border: 1px solid #c4cbd1;
-    border-radius: 0;
-    background-color: white;
-    margin-bottom: 10px;
-    height: calc(50vh - 8.25rem);
-}
-
-.lunar .leftmouse {
-    background: linear-gradient(#fdfdfd, #f0f0ea);
-    border: 1px solid;
-    border-radius:5px;
-    font-weight: normal;
-    width: 49%;
-}
-
-.lunar .rightmouse {
-    background: linear-gradient(#fdfdfd, #f0f0ea);
-    border: 1px solid;
-    border-radius:5px;
-    font-weight: normal;
-    width: 49%;
-}
-
-.lunar .keys {
-    color: black;
-    background: linear-gradient(#fdfdfd, #f0f0ea);
-    border: 1px solid;
-    border-radius:5px;
-    font-weight: normal;
-}
-.lunar .leftmouse:active { 
-    background: linear-gradient(#fdfdfd, #f0f0ea);
-    box-shadow: inset 0em 0em 1rem #eebe68;
-}
-.lunar .keys:active, .lunar .keys[data-active="true"], .lunar .rightmouse:active {
-    background: linear-gradient(#fdfdfd, #f0f0ea);
-    box-shadow: inset 0em 0em 1rem #eebe68;
-}
-
-.lunar .keyboard {
-    border: 1px solid #c4cbd1;
-    border-radius: 0;
-    background-color: white;
-    color: black;
-}
-
-@font-face {
-    font-family: Rubik;
-    src: url(fonts/Rubik-VariableFont_wght.ttf);
-}
-
-body.foundation {
-    background-color: white;
-}
-
-.foundation .touchpad {
-    background: transparent;
-    box-shadow: 0 0 .3rem 0 rgba(0,0,0,.25);
-}
-
-.foundation .leftmouse {
-    background: white;
-    border-top: 2px solid #e6e6e6;
-    border-right: 1px solid #e6e6e6;
-}
-
-.foundation .rightmouse {
-    background: white;
-    border-top: 2px solid #e6e6e6;
-    border-left: 1px solid #e6e6e6;
-}
-
-.foundation .backspace {
-    font-size: 0.6rem;
-}
-
-.foundation .keys {
-    background: rgb(0, 69, 173);
-    border-radius: .5rem;
-    font-family: 'Rubik';
-}
-.foundation .leftmouse:active,
-.foundation .rightmouse:active { 
-    background: #e9e9ed;
-}
-.foundation .keys:active, .foundation .keys[data-active="true"] {
-    background: #0052cc;
-}
-
-.foundation .keyboard {
-    border: 3px solid #999;
-    border-radius: 0;
-    background-color: white;
-    color: black;
-    font-family: 'Rubik';
-}
-
-.foundation .keyboard:focus {
-    outline: solid 2px #0052cc;
 }

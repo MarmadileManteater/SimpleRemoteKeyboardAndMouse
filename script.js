@@ -1,4 +1,4 @@
-(async function () {
+(async () => {
     let theme
     if ((theme = new URLSearchParams(window.location.search).get('theme')) !== undefined)
         document.body.setAttribute('class', theme)
@@ -58,4 +58,4 @@
         // clear out the position  object and the isTouching variable
         state = { x: 0, y: 0, isTouching: false, isScrolling: false, lastTimeSent: state.lastTimeSent }
     })
-}())
+})()
