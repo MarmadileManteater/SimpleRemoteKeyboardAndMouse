@@ -61,6 +61,8 @@ body {
     height: 10vh;
     margin-top: auto;
     color: var(--text-color);
+    font-weight: bold;
+    font-size: 3vw;
 }
 .flex-box .keyboard {
     width: 80vw;
@@ -80,7 +82,7 @@ body {
     background-color: var(--primary-color-hover);
 }
 @media (max-width: 768px) {
-    .long-text {
-        font-size: 0.7em;
+    .flex-box .keys.long-text {
+        font-size: 2.5vw;
     }
 }
