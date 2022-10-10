@@ -2,21 +2,16 @@
 import pyautogui
 import socket
 import sys
+from os.path import exists
+from os import remove
 from bottle import route, run, template, static_file, request
 
 # Disable the pyautogui failsafe to allow for moving the mouse to the corner of the screen
 pyautogui.FAILSAFE = False
-
 # Global state variable isDragging represents whether or not the mouse is currently dragging
 isDragging = False
 
-hostname = socket.gethostname()
-IP_addres = socket.gethostbyname(hostname)
-# if there are two arguments, use the command line argument for the ip address
-# otherwise just use the given ip address above.
-if len(sys.argv) > 1:
-    IP_addres = sys.argv[1]
-
+#region static assets
 @route('/script.js')
 def styles():
     return static_file("script.js", root='./')
@@ -33,8 +28,8 @@ def index():
 @route('/fonts/Rubik-VariableFont_wght.ttf')
 def foundationFont():
     return static_file("fonts/Rubik-VariableFont_wght.ttf", root="./", mimetype="application/x-font-ttf")
+#endregion
 #region keyboard controls
-
 # type whatever is sent through the pyautogui typewrite method
 @route('/typewrite')
 def sendkeystroke():
@@ -55,7 +50,6 @@ def sendHotkey(keys):
     pyautogui.hotkey(*keys)
 
 #endregion
-
 #region mouse controls
 @route('/mousemove/<x>/<y>')
 def mousemove(x, y):
@@ -87,4 +81,29 @@ def mousedrag(x, y):
 
 # endregion
 
-run(host=IP_addres, port=8080)
+def main(checkArgv = True):
+    if exists('./last-used-host.txt'):
+        lastUsedHost = open('./last-used-host.txt')
+        IP_addres = lastUsedHost.read()
+        lastUsedHost.close()
+    else:
+        hostname = socket.gethostname()
+        IP_addres = socket.gethostbyname(hostname)
+    # if there are two arguments, use the command line argument for the ip address
+    # otherwise just use the given ip address above.
+    if checkArgv and len(sys.argv) > 1:
+        IP_addres = sys.argv[1]
+    try:
+        aboutToUseHost=open('./last-used-host.txt', 'w')
+        aboutToUseHost.write(IP_addres)
+        aboutToUseHost.close()
+        run(host=IP_addres, port=8080)
+    except Exception as e:
+        print(e)
+        if exists('./last-used-host.txt'):
+            print('Trying an ip address given by the system . . . ')
+            remove('./last-used-host.txt')
+            main(False)
+
+if __name__ == '__main__':
+    main()
