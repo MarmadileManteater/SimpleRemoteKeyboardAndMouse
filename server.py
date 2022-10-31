@@ -83,9 +83,8 @@ def mousedrag(x, y):
 
 def main(checkArgv = True):
     if exists('./last-used-host.txt'):
-        lastUsedHost = open('./last-used-host.txt')
-        IP_addres = lastUsedHost.read()
-        lastUsedHost.close()
+        with open('./last-used-host.txt') as lastUsedHost:
+            IP_addres = lastUsedHost.read()
     else:
         hostname = socket.gethostname()
         IP_addres = socket.gethostbyname(hostname)
@@ -94,9 +93,8 @@ def main(checkArgv = True):
     if checkArgv and len(sys.argv) > 1:
         IP_addres = sys.argv[1]
     try:
-        aboutToUseHost=open('./last-used-host.txt', 'w')
-        aboutToUseHost.write(IP_addres)
-        aboutToUseHost.close()
+        with open('./last-used-host.txt', 'w') as aboutToUseHost:
+            aboutToUseHost.write(IP_addres)
         run(host=IP_addres, port=8080)
     except Exception as e:
         print(e)
