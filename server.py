@@ -1,44 +1,51 @@
 
+""" server entrypoint """
+
 import logging
-import pyautogui
-import socket
-import sys
 from os.path import exists
 from os import remove
-from bottle import route, run, template, static_file, request
-from SimpleLogFormatter import SimpleLogFormatter
+import socket
+import sys
+import pyautogui
+from bottle import route, run, static_file, request
+from simple_log_formatter import SimpleLogFormatter
 
-
-logger = logging.getLogger('simple_remote_keyboard_and_mouse')
-# Disable the pyautogui failsafe to allow for moving the mouse to the corner of the screen
+# Disable the pyautogui failsafe to allow for moving the mouse to the
+# corner of the screen
 pyautogui.FAILSAFE = False
-# Global state variable isDragging represents whether or not the mouse is currently dragging
-isDragging = False
+# Global state variable __is_dragging__ represents whether or not the mouse is
+# currently dragging
+__is_dragging__ = False
+__logger__ = logging.getLogger('simple_remote_keyboard_and_mouse')
+
 
 @route('/script.js')
-def styles():
+def scripts():
+    """ the script for the controls page """
     return static_file("script.js", root='./')
+
 
 @route('/styles.css')
 def styles():
+    """ the styles for the controls page """
     return static_file("styles.css", root='./')
 
-# at the route, serve up the controls page
+
 @route('/')
 def index():
+    """ tThe controls page """
     return static_file("controls.html", root='./')
 
-@route('/fonts/Rubik-VariableFont_wght.ttf')
-def foundationFont():
-    return static_file("fonts/Rubik-VariableFont_wght.ttf", root="./", mimetype="application/x-font-ttf")
 
-# type whatever is sent through the pyautogui typewrite method
 @route('/typewrite')
 def sendkeystroke():
+    """ typewrites the given query from the client """
     pyautogui.typewrite(request.query.get("query"))
+
 
 @route('/send/<key>')
 def sendkey(key):
+    """ receives keypresses from the client (also handles mouse clicks) """
     if key == 'leftclick':
         pyautogui.click()
     elif key == 'rightclick':
@@ -46,66 +53,79 @@ def sendkey(key):
     else:
         pyautogui.press(key)
 
+
 @route('/send-hotkey/<keys>')
-def sendHotkey(keys):
+def send_hotkey(keys):
+    """ receives hotkey combinations from the client """
     keys = keys.split(',')
     pyautogui.hotkey(*keys)
 
+
 @route('/mousemove/<x>/<y>')
-def mousemove(x, y):
-    currentX, currentY = pyautogui.position()
-    pyautogui.moveTo(currentX + float(x), currentY + float(y))
+def mousemove(x_move, y_move):
+    """ handles mouse move events sent from the client """
+    current_x, current_y = pyautogui.position()
+    pyautogui.moveTo(current_x + float(x_move), current_y + float(y_move))
+
 
 @route('/mousescroll/<x>/<y>')
-def mousescroll(x, y):
-    h = int(float(x)) * 4
-    v = int(float(y)) * 4
-    pyautogui.hscroll(h)
-    pyautogui.vscroll(v)
+def mousescroll(x_scroll, y_scroll):
+    """ handles mouse scroll events sent from the client """
+    horizontal_scroll = int(float(x_scroll)) * 4
+    vertical_scroll = int(float(y_scroll)) * 4
+    pyautogui.hscroll(horizontal_scroll)
+    pyautogui.vscroll(vertical_scroll)
+
 
 @route('/disabledrag')
 def disabledrag():
-    global isDragging
+    """ disables drag (if currently dragging) """
+    global __is_dragging__
     pyautogui.mouseUp()
-    isDragging = False
+    __is_dragging__ = False
+
 
 @route('/mousedrag/<x>/<y>')
-def mousedrag(x, y):
-    global isDragging
-    currentX, currentY = pyautogui.position()
-    if isDragging is False:
-        pyautogui.mouseDown(currentX + int(x), currentY + int(y))
-        isDragging = True
+def mousedrag(x_drag, y_drag):
+    """ handles drag events sent from the client """
+    global __is_dragging__
+    current_x, current_y = pyautogui.position()
+    if __is_dragging__ is False:
+        pyautogui.mouseDown(current_x + int(x_drag), current_y + int(y_drag))
+        __is_dragging__ = True
     else:
-        pyautogui.moveTo(currentX + int(x), currentY + int(y))
+        pyautogui.moveTo(current_x + int(x_drag), current_y + int(y_drag))
 
-def main(checkArgv = True):
-    global logger
+
+def main(check_argv=True):
+    """ entrypoint """
     if exists('./last-used-host.txt'):
-        with open('./last-used-host.txt') as lastUsedHost:
-            IP_addres = lastUsedHost.read()
+        with open('./last-used-host.txt', encoding='utf8') as last_used_host:
+            ip_address = last_used_host.read()
     else:
         hostname = socket.gethostname()
-        IP_addres = socket.gethostbyname(hostname)
+        ip_address = socket.gethostbyname(hostname)
     # if there are two arguments, use the command line argument for the ip address
     # otherwise just use the given ip address above
-    if checkArgv and len(sys.argv) > 1:
-        IP_addres = sys.argv[1]
+    if check_argv and len(sys.argv) > 1:
+        ip_address = sys.argv[1]
     try:
-        with open('./last-used-host.txt', 'w') as aboutToUseHost:
-            aboutToUseHost.write(IP_addres)
-        run(host=IP_addres, port=8080)
-    except Exception as e:
-        logger.error(e)
+        with open('./last-used-host.txt', 'w', encoding='utf8') as about_to_use_host:
+            about_to_use_host.write(ip_address)
+        run(host=ip_address, port=8080)
+    except socket.gaierror as error:
+        __logger__.error(error)
         if exists('./last-used-host.txt'):
-            logger.warning('Launching with given IP address failed\nTrying an ip address given by the system . . . ')
+            __logger__.warning("Launching with given IP address failed")
+            __logger__.warning("Trying an ip address given by the system ")
             remove('./last-used-host.txt')
             main(False)
 
+
 if __name__ == '__main__':
-    logger.setLevel(logging.DEBUG)
+    __logger__.setLevel(logging.DEBUG)
     streamHandler = logging.StreamHandler()
     streamHandler.setLevel(logging.DEBUG)
     streamHandler.setFormatter(SimpleLogFormatter())
-    logger.addHandler(streamHandler)
+    __logger__.addHandler(streamHandler)
     main()
