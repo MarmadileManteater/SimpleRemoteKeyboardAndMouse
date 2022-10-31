@@ -1,11 +1,15 @@
 
+import logging
 import pyautogui
 import socket
 import sys
 from os.path import exists
 from os import remove
 from bottle import route, run, template, static_file, request
+from SimpleLogFormatter import SimpleLogFormatter
 
+
+logger = logging.getLogger('simple_remote_keyboard_and_mouse')
 # Disable the pyautogui failsafe to allow for moving the mouse to the corner of the screen
 pyautogui.FAILSAFE = False
 # Global state variable isDragging represents whether or not the mouse is currently dragging
@@ -82,6 +86,7 @@ def mousedrag(x, y):
 # endregion
 
 def main(checkArgv = True):
+    global logger
     if exists('./last-used-host.txt'):
         with open('./last-used-host.txt') as lastUsedHost:
             IP_addres = lastUsedHost.read()
@@ -89,7 +94,7 @@ def main(checkArgv = True):
         hostname = socket.gethostname()
         IP_addres = socket.gethostbyname(hostname)
     # if there are two arguments, use the command line argument for the ip address
-    # otherwise just use the given ip address above.
+    # otherwise just use the given ip address above
     if checkArgv and len(sys.argv) > 1:
         IP_addres = sys.argv[1]
     try:
@@ -97,11 +102,16 @@ def main(checkArgv = True):
             aboutToUseHost.write(IP_addres)
         run(host=IP_addres, port=8080)
     except Exception as e:
-        print(e)
+        logger.error(e)
         if exists('./last-used-host.txt'):
-            print('Trying an ip address given by the system . . . ')
+            logger.warning('Launching with given IP address failed\nTrying an ip address given by the system . . . ')
             remove('./last-used-host.txt')
             main(False)
 
 if __name__ == '__main__':
+    logger.setLevel(logging.DEBUG)
+    streamHandler = logging.StreamHandler()
+    streamHandler.setLevel(logging.DEBUG)
+    streamHandler.setFormatter(SimpleLogFormatter())
+    logger.addHandler(streamHandler)
     main()
