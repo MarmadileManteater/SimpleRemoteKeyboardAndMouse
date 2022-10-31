@@ -73,7 +73,7 @@ def disabledrag():
 def mousedrag(x, y):
     global isDragging
     currentX, currentY = pyautogui.position()
-    if isDragging == False:
+    if isDragging is False:
         pyautogui.mouseDown(currentX + int(x), currentY + int(y))
         isDragging = True
     else:
