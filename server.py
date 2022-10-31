@@ -15,7 +15,6 @@ pyautogui.FAILSAFE = False
 # Global state variable isDragging represents whether or not the mouse is currently dragging
 isDragging = False
 
-#region static assets
 @route('/script.js')
 def styles():
     return static_file("script.js", root='./')
@@ -32,8 +31,7 @@ def index():
 @route('/fonts/Rubik-VariableFont_wght.ttf')
 def foundationFont():
     return static_file("fonts/Rubik-VariableFont_wght.ttf", root="./", mimetype="application/x-font-ttf")
-#endregion
-#region keyboard controls
+
 # type whatever is sent through the pyautogui typewrite method
 @route('/typewrite')
 def sendkeystroke():
@@ -53,8 +51,6 @@ def sendHotkey(keys):
     keys = keys.split(',')
     pyautogui.hotkey(*keys)
 
-#endregion
-#region mouse controls
 @route('/mousemove/<x>/<y>')
 def mousemove(x, y):
     currentX, currentY = pyautogui.position()
@@ -82,8 +78,6 @@ def mousedrag(x, y):
         isDragging = True
     else:
         pyautogui.moveTo(currentX + int(x), currentY + int(y))
-
-# endregion
 
 def main(checkArgv = True):
     global logger
