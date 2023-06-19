@@ -1,13 +1,14 @@
 
 """ server entrypoint """
 
+import platform
 import logging
 from os.path import exists
 from os import remove
 import socket
 import sys
 import pyautogui
-from bottle import route, run, static_file, request
+from bottle import route, run, static_file, request, template
 from simple_log_formatter import SimpleLogFormatter
 
 # Disable the pyautogui failsafe to allow for moving the mouse to the
@@ -22,19 +23,19 @@ __logger__ = logging.getLogger('simple_remote_keyboard_and_mouse')
 @route('/script.js')
 def scripts():
     """ the script for the controls page """
-    return static_file("script.js", root='./')
+    return static_file("script.js", root='./static/')
 
 
 @route('/styles.css')
 def styles():
     """ the styles for the controls page """
-    return static_file("styles.css", root='./')
+    return static_file("styles.css", root='./static/')
 
 
 @route('/')
 def index():
     """ tThe controls page """
-    return static_file("controls.html", root='./')
+    return template("controls", platform=platform.system())
 
 
 @route('/typewrite')
