@@ -86,7 +86,7 @@ def disabledrag():
     __is_dragging__ = False
 
 
-@route('/mousedrag/<x>/<y>')
+@route('/mousedrag/<x_drag>/<y_drag>')
 def mousedrag(x_drag, y_drag):
     """ handles drag events sent from the client """
     global __is_dragging__
