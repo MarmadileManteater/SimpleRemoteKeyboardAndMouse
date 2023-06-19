@@ -61,14 +61,14 @@ def send_hotkey(keys):
     pyautogui.hotkey(*keys)
 
 
-@route('/mousemove/<x>/<y>')
+@route('/mousemove/<x_move>/<y_move>')
 def mousemove(x_move, y_move):
     """ handles mouse move events sent from the client """
     current_x, current_y = pyautogui.position()
     pyautogui.moveTo(current_x + float(x_move), current_y + float(y_move))
 
 
-@route('/mousescroll/<x>/<y>')
+@route('/mousescroll/<x_scroll>/<y_scroll>')
 def mousescroll(x_scroll, y_scroll):
     """ handles mouse scroll events sent from the client """
     horizontal_scroll = int(float(x_scroll)) * 4
