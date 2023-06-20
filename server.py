@@ -25,6 +25,10 @@ __logger__ = logging.getLogger('simple_remote_keyboard_and_mouse')
 
 
 def get_audio_system_linux():
+    """ 
+        determines if `pactl` or `amixer` are available in linux
+        returns the name of whichever it finds first or None 
+    """
     if platform.system().lower() == 'linux':
         if "/pactl" in subprocess.run(("type pactl"), capture_output=True, shell=True).stdout.decode():
             return 'pactl'
@@ -34,6 +38,7 @@ def get_audio_system_linux():
 
 
 def is_volume_control_possible():
+    """ determines if volume control is currently possible / implemented for the current platform """
     # if this is windows, this will always be possible
     if platform.system() == 'windows':
         return True
@@ -44,6 +49,7 @@ def is_volume_control_possible():
 
 
 def volume_control(control):
+    """ takes in a windows volume control key input and handles it in linux as well """
     if platform.system().lower() == 'linux':
         # need to handle this with some cli tool
         audio_controls_system = get_audio_system_linux()
