@@ -20,7 +20,7 @@
             <button class="ui keys border-radius" data-hotkey="ctrl,c">Copy</button>
             <button class="ui keys border-radius" data-hotkey="ctrl,v" >Paste</button>
             <button class="ui keys border-radius" data-toggle="drag">Toggle Drag</button>
-            % if platform == 'windows':
+            % if volume_controls:
             <button class="ui keys border-radius" data-send="volumemute">🔇</button>
             <button class="ui keys border-radius" data-send="volumedown">🔈</button>
             <button class="ui keys border-radius" data-send="volumeup">🔊</button>

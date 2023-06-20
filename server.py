@@ -5,11 +5,15 @@ import platform
 import logging
 from os.path import exists
 from os import remove
+import subprocess
 import socket
 import sys
 import pyautogui
+import re
 from bottle import route, run, static_file, request, template
 from simple_log_formatter import SimpleLogFormatter
+
+VOLUME_BUMP_AMOUNT = 10# volume only changes by 10% intervals
 
 # Disable the pyautogui failsafe to allow for moving the mouse to the
 # corner of the screen
@@ -18,6 +22,68 @@ pyautogui.FAILSAFE = False
 # currently dragging
 __is_dragging__ = False
 __logger__ = logging.getLogger('simple_remote_keyboard_and_mouse')
+
+
+def get_audio_system_linux():
+    if platform.system().lower() == 'linux':
+        if "/pactl" in subprocess.run(("type pactl"), capture_output=True, shell=True).stdout.decode():
+            return 'pactl'
+        if "/amixer" in subprocess.run(("type amixer"), capture_output=True, shell=True).stdout.decode():
+            return 'amixer'
+    return None
+
+
+def is_volume_control_possible():
+    # if this is windows, this will always be possible
+    if platform.system() == 'windows':
+        return True
+    # check to see if there is an audio system we can interface with in linux
+    if get_audio_system_linux() != None:
+        return True
+    return False
+
+
+def volume_control(control):
+    if platform.system().lower() == 'linux':
+        # need to handle this with some cli tool
+        audio_controls_system = get_audio_system_linux()
+        if audio_controls_system == 'pactl':
+            # obtain default sink name from `pactl info`
+            default_sink_name = subprocess.run(("pactl info | grep 'Default Sink'"), capture_output=True, shell=True).stdout.decode().replace("Default Sink: ", "").replace("\n", "")
+            # find number matching default sink name in `pactl list sinks`            
+            re_running_sinks = re.compile(r"Sink #([0-9])  State: [A-Z]*?  Name: {default_sink_name}".format(default_sink_name=default_sink_name), flags=re.S|re.M)
+            running_sinks = subprocess.run(("pactl list sinks"), capture_output=True, shell=True).stdout.decode().replace("\n", " ").replace("\t", " ")
+            default_sink_num = re_running_sinks.search(running_sinks).group(1)
+            # perform the operation on the sink
+            set_value = None
+            if control == "volumeup":
+                set_value = "+%i" % VOLUME_BUMP_AMOUNT
+            elif control == "volumedown":
+                set_value = "-%i" % VOLUME_BUMP_AMOUNT
+            elif control == "volumemute":
+                set_value = 0
+            if set_value != None:
+                subprocess.run(("pactl", "set-sink-volume", "{sink_num}".format(sink_num=default_sink_num), "{set_value}%".format(set_value=set_value)))
+            else:
+                print("Command \"%\" not supported" % control)
+        elif audio_controls_system == 'amixer':
+            # amixer doesn't support relative volume inputs, so we have to check what the volume is first
+            volume_info = subprocess.run(("amixer sget 'Master'"), capture_output=True, shell=True).stdout.decode().replace("\n", "")
+            re_volume_level = re.compile(r"\[([0-9]*?)%\]")
+            volume_level = int(re_volume_level.search(volume_info).group(1))
+            set_value = None
+            if control == "volumeup":
+                set_value = "%i" % (volume_level + VOLUME_BUMP_AMOUNT)
+            elif control == "volumedown":
+                set_value = "%i" % (volume_level - VOLUME_BUMP_AMOUNT)
+            elif control == "volumemute":
+                set_value = "0"
+            if set_value != None:
+                subprocess.run(("amixer", "sset", "'Master'", "{set_value}%".format(set_value=set_value)))
+            else:
+                print("Command \"%\" not supported" % control)
+    elif platform.system().lower() == 'windows':
+        pyautogui.press(control)
 
 
 @route('/script.js')
@@ -35,7 +101,7 @@ def styles():
 @route('/')
 def index():
     """ tThe controls page """
-    return template("controls", platform=platform.system())
+    return template("controls", volume_controls=is_volume_control_possible())
 
 
 @route('/typewrite')
@@ -51,6 +117,12 @@ def sendkey(key):
         pyautogui.click()
     elif key == 'rightclick':
         pyautogui.rightClick()
+    elif key == 'volumeup':
+        volume_control(key)
+    elif key == 'volumedown':
+        volume_control(key)
+    elif key == 'volumemute':
+        volume_control(key)
     else:
         pyautogui.press(key)
 
