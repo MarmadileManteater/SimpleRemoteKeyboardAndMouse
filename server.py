@@ -56,10 +56,6 @@ def volume_control(control):
         if audio_controls_system == 'pactl':
             # obtain default sink name from `pactl info`
             default_sink_name = subprocess.run(("pactl info | grep 'Default Sink'"), capture_output=True, shell=True).stdout.decode().replace("Default Sink: ", "").replace("\n", "")
-            # find number matching default sink name in `pactl list sinks`            
-            re_running_sinks = re.compile(r"Sink #([0-9])  State: [A-Z]*?  Name: {default_sink_name}".format(default_sink_name=default_sink_name), flags=re.S|re.M)
-            running_sinks = subprocess.run(("pactl list sinks"), capture_output=True, shell=True).stdout.decode().replace("\n", " ").replace("\t", " ")
-            default_sink_num = re_running_sinks.search(running_sinks).group(1)
             # perform the operation on the sink
             set_value = None
             if control == "volumeup":
@@ -69,7 +65,7 @@ def volume_control(control):
             elif control == "volumemute":
                 set_value = 0
             if set_value != None:
-                subprocess.run(("pactl", "set-sink-volume", "{sink_num}".format(sink_num=default_sink_num), "{set_value}%".format(set_value=set_value)))
+                subprocess.run(("pactl", "set-sink-volume", "{sink_name}".format(sink_name=default_sink_name), "{set_value}%".format(set_value=set_value)))
             else:
                 print("Command \"%\" not supported" % control)
         elif audio_controls_system == 'amixer':
