@@ -187,7 +187,7 @@ def main(check_argv=True):
     try:
         with open('./last-used-host.txt', 'w', encoding='utf8') as about_to_use_host:
             about_to_use_host.write(ip_address)
-        run(host=ip_address, port=8080)
+        run(host=ip_address.rstrip(), port=8080)
     except socket.gaierror as error:
         __logger__.error(error)
         if exists('./last-used-host.txt'):
