@@ -10,7 +10,8 @@ import socket
 import sys
 import pyautogui
 import re
-from bottle import route, run, static_file, request, template
+from bottle import route, default_app, static_file, request, template
+from paste import httpserver
 from simple_log_formatter import SimpleLogFormatter
 
 VOLUME_BUMP_AMOUNT = 10# volume only changes by 10% intervals
@@ -187,7 +188,8 @@ def main(check_argv=True):
     try:
         with open('./last-used-host.txt', 'w', encoding='utf8') as about_to_use_host:
             about_to_use_host.write(ip_address)
-        run(host=ip_address.rstrip(), port=8080)
+        app = default_app()
+        httpserver.serve(app, host=ip_address.rstrip(), port=8080)
     except socket.gaierror as error:
         __logger__.error(error)
         if exists('./last-used-host.txt'):
