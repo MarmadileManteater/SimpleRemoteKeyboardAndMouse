@@ -40,7 +40,7 @@ def get_audio_system_linux():
 def is_volume_control_possible():
     """ determines if volume control is currently possible / implemented for the current platform """
     # if this is windows, this will always be possible
-    if platform.system() == 'windows':
+    if platform.system().lower() == 'windows':
         return True
     # check to see if there is an audio system we can interface with in linux
     if get_audio_system_linux() != None:
