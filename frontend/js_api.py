@@ -38,6 +38,10 @@ def remove_child(parent, child):
 def inner_html(element, html):
   element.innerHTML = html
 
+def style(element, obj):
+  for key in Object.keys(obj):
+    element.style[key] = obj[key]
+
 def set_attribute(element, key, value):
   element.setAttribute(key, value)
 
@@ -53,4 +57,4 @@ def date(arg = None):
 def get_time(date):
   return date.getTime()
 
-__all__ = ['set_timeout', 'encode_uri', 'type_of', 'query_selector', 'query_selector_all', 'add_event_listener', 'prevent_default', 'clone_template', 'append_child', 'prepend_child', 'remove_child', 'inner_html', 'set_attribute', 'get_attribute', 'date', 'get_time']
+__all__ = ['set_timeout', 'encode_uri', 'type_of', 'query_selector', 'query_selector_all', 'add_event_listener', 'prevent_default', 'clone_template', 'append_child', 'prepend_child', 'remove_child', 'inner_html', 'style', 'set_attribute', 'get_attribute', 'date', 'get_time']

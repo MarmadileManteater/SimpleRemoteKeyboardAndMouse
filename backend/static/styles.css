@@ -117,8 +117,18 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
 
 .toast[data-visibility="fade-out"] {
   opacity: 0;
+}
+
+#status-light {
+  width: 20px;
+  height: 20px;
+  border-radius:50%;
+  background-color: grey;
+  margin-bottom: 0.7em;
 }

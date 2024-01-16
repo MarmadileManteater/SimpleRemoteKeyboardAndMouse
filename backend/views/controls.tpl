@@ -11,8 +11,10 @@
         <meta name="api-version" content="{{api_version}}" />
     </head>    
     <body >
+        % if disable_indicator != True:
+        <div id="status-light"></div>
+        % end
         <div id="toast-center">
-
         </div>
         <div class="touchpad flex-box wrap border-radius">
             <div class="touch"></div>

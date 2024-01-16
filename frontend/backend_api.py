@@ -1,5 +1,5 @@
 
-from toast import toast
+from toast import toast, indicate_status
 
 async def request(endpoint, method = 'GET', body = None):
   try:
@@ -12,6 +12,7 @@ async def request(endpoint, method = 'GET', body = None):
       json = await response.json()
       if response.status != 200:
         raise Exception(f'Status code {response.status} does not indiciate success. <br/> Inner error: {json.message}')
+      indicate_status('#04ff89')
       return json
     except Exception as error:
       if error.name == 'AbortError':
@@ -19,6 +20,7 @@ async def request(endpoint, method = 'GET', body = None):
       else:
         raise error
   except Exception as error:
+    indicate_status('#ff0404')
     toast(f"⛔", error)
 
 async def input_api(command_type, parameters):

@@ -20,6 +20,9 @@ legacy_api = '--legacy-api' in sys.argv
 # in order to not mess with existing argument parsing
 if legacy_api:
     sys.argv.remove('--legacy-api')
+disable_indicator = '--disable-indicator' in sys.argv
+if disable_indicator:
+    sys.argv.remove('--disable-indicator')
 
 VOLUME_BUMP_AMOUNT = 10# volume only changes by 10% intervals
 
@@ -122,7 +125,7 @@ def styles():
 @route('/')
 def index():
     """ The controls page """
-    return template("controls", volume_controls=is_volume_control_possible(), api_version=__api__)
+    return template("controls", volume_controls=is_volume_control_possible(), api_version=__api__, disable_indicator=disable_indicator)
 
 def mouse(x_move, y_move, movement_type):
     """ handles mouse move events sent from the client """

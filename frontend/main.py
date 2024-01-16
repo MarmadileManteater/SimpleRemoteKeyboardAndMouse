@@ -3,7 +3,7 @@ from distance import calculate_distance
 from js_api import query_selector, query_selector_all, add_event_listener, prevent_default, get_attribute, set_attribute, encode_uri, type_of, date, get_time
 from backend_api import mouse, request, input_api
 from state import State
-from toast import toast
+from toast import toast_center
 
 api_version = query_selector('meta[name="api-version"]')
 __api__ = get_attribute(api_version, 'content')
@@ -102,7 +102,7 @@ add_event_listener(touchpad, 'touchstart', on_touch_start)
 
 def on_touch_move(e):
   """ called when the touchpad is being 👆touched and the touch is changing position """
-  if state.last_time_sent < get_time(date()) - 150:
+  if state.last_time_sent < get_time(date()) - 150 and len(toast_center.children) == 0:
     touches = [(touch.clientX, touch.clientY) for touch in e.touches]
     x, y = touches[0]
     dx = int(state.x - x)
