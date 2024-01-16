@@ -1,1 +1,4 @@
 last-used-host.txt
+client/*.js
+client/*.js.map
+__pycache__/

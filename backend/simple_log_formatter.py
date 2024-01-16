@@ -2,7 +2,6 @@
 
 import logging
 
-
 class SimpleLogFormatter(logging.Formatter):
     """ a simple color formatter for logs """
     grey = '\033[97m'

@@ -86,3 +86,39 @@ body {
         font-size: 2.5vw;
     }
 }
+#toast-center {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  gap: 0.5em;
+  flex-direction: column;
+  padding: 1em;
+  padding-right: 1.5em;
+}
+
+.toast {
+  transition: opacity 2s ease;
+  font-family: monospace;
+  color: white;
+  background-color: rgb(10, 10, 10);
+  padding: 0.5em 1em;
+  padding-top: 0;
+  display: flex;
+  gap: 0.5em;
+  border-radius: 1em;
+}
+
+.toast .icon {
+  font-size: 2.75em;
+  padding: 0.25em;
+}
+
+.toast .icon, .toast .message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.toast[data-visibility="fade-out"] {
+  opacity: 0;
+}
