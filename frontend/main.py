@@ -30,14 +30,15 @@ for element in query_selector_all('.ui'):
   toggle = get_attribute(element, 'data-toggle')
   if toggle:
     if toggle == 'drag':
-      def toggle_drag(element):
-        def t():
+      def freeze_element_with_callback(element):
+        """ 🧊 freeze specific `element` for a callback """
+        def callback():
           # switch the toggle
           state.is_dragging = state.is_dragging == False
           set_attribute(element, 'data-active', state.is_dragging)
           return '/disabledrag'
-        return t
-      map_button_event_to_route(element, 'click', toggle_drag(element))
+        return callback
+      map_button_event_to_route(element, 'click', freeze_element_with_callback(element))
 
 touchpad = query_selector('.touch')
 
