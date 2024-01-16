@@ -10,10 +10,16 @@ import socket
 import sys
 import pyautogui
 import re
+import json
 from bottle import route, default_app, static_file, request, template, response, TEMPLATE_PATH
 from paste import httpserver
 from .simple_log_formatter import SimpleLogFormatter
 from .helpers.javascripthon import compileJsthon
+
+legacy_api = '--legacy-api' in sys.argv
+# in order to not mess with existing argument parsing
+if legacy_api:
+    sys.argv.remove('--legacy-api')
 
 VOLUME_BUMP_AMOUNT = 10# volume only changes by 10% intervals
 
@@ -25,6 +31,8 @@ pyautogui.FAILSAFE = False
 __is_dragging__ = False
 __logger__ = logging.getLogger('simple_remote_keyboard_and_mouse')
 __client_side_script__ = None
+
+__api__ = 'v1' if legacy_api else 'v2'
 
 TEMPLATE_PATH.insert(0, './backend/views')
 
@@ -106,20 +114,6 @@ def dynamic_python_script_loader(script_name):
         response.content_type = 'application/javascript; charset=utf-8'
         return 'console.log("404 - Not found.")'
 
-#@route('/<script_name>.js.map')
-def dynamic_python_source_map_loader(script_name):
-    py_script_name = f"./frontend/{script_name}.py"
-    if exists(py_script_name):
-        jsthon = compileJsthon(py_script_name)
-        response.content_type = 'application/json; encoding=utf-8'
-        response.status = 200
-        return jsthon['map']
-    else:
-        response.status = 404
-        response.content_type = 'application/json; encoding=utf-8'
-        return '{ "status": 404, "content": "Not found" }'
-
-
 @route('/styles.css')
 def styles():
     """ the styles for the controls page """
@@ -128,49 +122,8 @@ def styles():
 @route('/')
 def index():
     """ The controls page """
-    return template("controls", volume_controls=is_volume_control_possible())
+    return template("controls", volume_controls=is_volume_control_possible(), api_version=__api__)
 
-
-@route('/typewrite')
-def sendkeystroke():
-    """ typewrites the given query from the client """
-    pyautogui.typewrite(request.query.get("query"))
-
-
-@route('/send/<key>')
-def sendkey(key):
-    """ receives keypresses from the client (also handles mouse clicks) """
-    try:
-        if key == 'leftclick':
-            pyautogui.click()
-        elif key == 'rightclick':
-            pyautogui.rightClick()
-        elif key == 'volumeup':
-            volume_control(key)
-        elif key == 'volumedown':
-            volume_control(key)
-        elif key == 'volumemute':
-            volume_control(key)
-        else:
-            pyautogui.press(key)
-        response.content_type = 'application/json; encoding=utf-8'
-        response.status = 200
-        return '{ \"type\": \"success\" }'
-    except Exception as e:
-        response.content_type = 'application/json; encoding=utf-8'
-        response.status = 500
-        return f'{{ \"type\": \"error\", "message": "{e}" }}'
-
-
-@route('/send-hotkey/<keys>')
-def send_hotkey(keys):
-    """ receives hotkey combinations from the client """
-    keys = keys.split(',')
-    pyautogui.hotkey(*keys)
-    response.content_type = 'application/json'
-    return f"{{ \"type\": \"success\", \"message\": \"hotkey {'+'.join(keys)} was pressed\"}}"
-
-@route('/mouse<movement_type>/<x_move>/<y_move>')
 def mouse(x_move, y_move, movement_type):
     """ handles mouse move events sent from the client """
     global __is_dragging__
@@ -204,7 +157,36 @@ def mouse(x_move, y_move, movement_type):
         response.status = 500
         return f'{{ "type": "error", "message": "{e}" }}'
 
-@route('/disabledrag')
+def send_key(key):
+    """ receives keypresses from the client (also handles mouse clicks) """
+    try:
+        if key == 'leftclick':
+            pyautogui.click()
+        elif key == 'rightclick':
+            pyautogui.rightClick()
+        elif key == 'volumeup':
+            volume_control(key)
+        elif key == 'volumedown':
+            volume_control(key)
+        elif key == 'volumemute':
+            volume_control(key)
+        else:
+            pyautogui.press(key)
+        response.content_type = 'application/json; encoding=utf-8'
+        response.status = 200
+        return '{ \"type\": \"success\" }'
+    except Exception as e:
+        response.content_type = 'application/json; encoding=utf-8'
+        response.status = 500
+        return f'{{ \"type\": \"error\", "message": "{e}" }}'
+
+def send_hotkey(keys):
+    """ receives hotkey combinations from the client """
+    keys = keys.split(',')
+    pyautogui.hotkey(*keys)
+    response.content_type = 'application/json'
+    return f"{{ \"type\": \"success\", \"message\": \"hotkey {'+'.join(keys)} was pressed\"}}"
+
 def disabledrag():
     """ disables drag (if currently dragging) """
     global __is_dragging__
@@ -214,10 +196,109 @@ def disabledrag():
     response.content_type = 'application/json'
     response.status = 200
     if was_dragging:
-      return '{ "type": "success", "message": "Disabled existing drag" }'
+        return '{ "type": "success", "message": "Disabled existing drag" }'
     else:
-      return '{ "type": "info", "message": "Nothing to do" }'
+        return '{ "type": "info", "message": "Nothing to do" }'
 
+if __api__ == 'v1':
+    @route('/api/v2/input', method=['POST'])
+    def take_input():
+        response.status = 403
+        response.content_type = 'application/json'
+        return json.dumps({
+            'type': 'error',
+            'message': 'This endpoint is unavailable when legacy API is enabled.'
+        })
+    @route('/typewrite')
+    def sendkeystroke():
+        """ typewrites the given query from the client """
+        query = request.query.get("query")
+        pyautogui.typewrite(query)
+        response.content_type = 'application/json'
+        response.status = 200
+        return f'{{ "type": "success", "message": "Wrote \'{query}\'" }}'
+
+    @route('/send/<key>')
+    def send_keyv1(key):
+        return send_key(key)
+
+    @route('/send-hotkey/<keys>')
+    def send_hotkeyv1(keys):
+        return send_hotkey(keys)
+
+    @route('/mouse<movement_type>/<x_move>/<y_move>')
+    def mousev1(movement_type, x_move, y_move):
+        return mouse(x_move, y_move, movement_type)
+
+    @route('/disabledrag')
+    def disabledragv1():
+        return disabledrag()
+
+if __api__ == 'v2':
+    @route('/typewrite')
+    @route('/send/<arg1>')
+    @route('/send-hotkey/<arg1>')
+    @route('/mouse<arg1>/<arg2>/<arg3>')
+    @route('/disabledrag')
+    def take_input(arg1 = None, arg2 = None, arg3 = None):
+        response.status = 403
+        response.content_type = 'application/json'
+        return json.dumps({
+            'type': 'error',
+            'message': 'Legacy API endpoints are currently disabled.'
+        })
+    @route('/api/v2/input', method=['POST'])
+    def take_input():
+        try:
+            input_object = json.loads(request.body.read().decode("utf-8"))
+            command_type = input_object['commandType']
+            parameters = input_object['parameters']
+            if command_type.startswith('mouse'):
+                mouse(parameters[0], parameters[1], command_type[5:])
+                verb = command_type[5:]
+                if verb == 'drag':
+                    verb = 'dragg'
+                if verb == 'move':
+                    verb = 'mov'
+                verb = f'{verb[0].upper()}{verb[1:]}'
+                verbed = f'{verb}ed'
+                response.content_type = 'application/json'
+                return json.dumps({
+                    'type': 'success',
+                    'message': f'{verbed} the mouse by ({parameters[0]}, {parameters[1]})'
+                })
+            if command_type == 'typewrite':
+                pyautogui.typewrite(parameters[0])
+                response.content_type = 'application/json'
+                response.status = 200
+                return json.dumps({
+                    'type': 'success',
+                    'message': f'Wrote \'{parameters[0]}\''
+                })
+            if command_type == 'send-key':
+                return send_key(parameters[0])
+            if command_type == 'send-hotkey':
+                return send_hotkey(','.join(parameters))
+            if command_type == 'disabledrag':
+                return disabledrag()
+            response.status = 406
+            response.content_type = 'application/json'
+            return json.dumps({
+                'type': 'error',
+                'message': f'Given command type \'{command_type}\' is not a valid command type',
+                'options': ['mousemove', 'mousedrag', 'mousescroll', 'send-key', 'send-hotkey', 'disabledrag']
+            })
+        except Exception as error:
+            response.status = 500
+            error_string = f"{error}".strip()
+            if error_string.startswith("'") and error_string.endswith("'"):
+                error = f"Body missing required field: {error_string}"
+                response.status = 406
+            response.content_type = 'application/json'
+            return json.dumps({
+                'type': 'error',
+                'message': f'{error}'
+            })
 
 def main(check_argv=True):
     """ entrypoint """

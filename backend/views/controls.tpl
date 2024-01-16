@@ -8,6 +8,7 @@
           <div class="message"></div>
         </template>
         <meta charset="utf-8"/>
+        <meta name="api-version" content="{{api_version}}" />
     </head>    
     <body >
         <div id="toast-center">
