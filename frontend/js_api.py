@@ -1,5 +1,12 @@
 
-# snakecase versions of common dom functions
+def set_timeout(callback, timeout):
+  return setTimeout(callback, timeout)
+
+def encode_uri(uri):
+  return encodeURI(uri)
+
+def type_of(variable):
+  return JS('typeof variable')
 
 def query_selector(query, target=document):
   return target.querySelector(query)
@@ -37,4 +44,13 @@ def set_attribute(element, key, value):
 def get_attribute(element, key):
   return element.getAttribute(key)
 
-__all__ = ['query_selector', 'query_selector_all', 'add_event_listener', 'prevent_default', 'clone_template', 'append_child', 'prepend_child', 'remove_child', 'inner_html', 'set_attribute', 'get_attribute']
+def date(arg = None):
+  if arg == None:
+    return Date()
+  else:
+    return Date(arg)
+
+def get_time(date):
+  return date.getTime()
+
+__all__ = ['set_timeout', 'encode_uri', 'type_of', 'query_selector', 'query_selector_all', 'add_event_listener', 'prevent_default', 'clone_template', 'append_child', 'prepend_child', 'remove_child', 'inner_html', 'set_attribute', 'get_attribute', 'date', 'get_time']

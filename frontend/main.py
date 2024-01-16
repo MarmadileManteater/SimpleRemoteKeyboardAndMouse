@@ -1,9 +1,7 @@
 
-from dom import query_selector, query_selector_all, add_event_listener, prevent_default, get_attribute, set_attribute
 from distance import calculate_distance
-from jsdate import date, get_time
-from jsapi import encode_uri, type_of
-from api import mouse, request
+from js_api import query_selector, query_selector_all, add_event_listener, prevent_default, get_attribute, set_attribute, encode_uri, type_of, date, get_time
+from backend_api import mouse, request
 from state import State
 from toast import toast
 

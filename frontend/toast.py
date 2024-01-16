@@ -1,6 +1,5 @@
 
-from dom import query_selector, clone_template, append_child, remove_child, inner_html, set_attribute
-from jsapi import set_timeout
+from js_api import query_selector, clone_template, append_child, remove_child, inner_html, set_attribute, set_timeout
 
 toast_template = query_selector("#toast")
 toast_center = query_selector("#toast-center")
